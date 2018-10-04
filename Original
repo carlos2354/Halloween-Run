@@ -1,1 +1,296 @@
 # Halloween-Run
+// game has 4 objects or 'obstacles'. They launch from right side of the screen in order of x then y then z then finally a. when a leaves the screen, x is launched again
+//and the whole progression is restarted.
+
+int x=1440; //x coordinates of objects x y z and a
+int y=1440;
+int z=1440;
+int a=1440;
+
+int y1=600; //y coordinate of objects x y z and 
+
+int nex=0; // (determines type of x object) determines the type of obstacles the objects will be. ie type 1 will make object x a small square, or type 2 will make it a small rectangle.  
+int next=0; //(of y object)                 there are 4 types in total.
+int next2=0; //(of z)
+int next3=0; //(of a)
+
+int xlauncher=1; //a 1 value will trigger the object to spawn from the right side. a 0 means it is not time to spawn
+int ylauncher=0;
+int zlauncher=0;
+int alauncher=0;
+
+int difficultyLevel= 2; // the amount in which the x axis of an object is reduced per second. This is the mechanism that moves the object from the right side to the left.
+
+int start=0; //difficultyLevel components
+int gap=0;
+int stopper=0;
+//higher difficulty means higher reduction of objects' x coordinates; travels to left faster.
+ 
+void setup() {  
+  size (2300, 850); //setup of purple and orange backgorund
+  fill(#A91BD1);
+  rect(0, 0, width, 600);
+  fill(#E87D25);
+  rect(0, y1, width, 200);
+  frameRate(150);
+  
+  
+  /*adjusts difficulty components. Faster travel of object dictates that gap must be enlarged between objects. Otherwise slow character will have no choice 
+   but to be caught*/
+  if (difficultyLevel==2) {
+    start=500; 
+    gap= 200; //checkpoints
+    stopper= start-gap*6;
+    println(stopper);
+
+    /*if (difficultyLevel==4) {
+     start=300; 
+     gap= 100; //checkpoints
+     stopper=start-gap*6;
+     println(stopper);*/
+  }
+}
+
+void draw() {
+  background (255);
+  translate(750, 0);
+  size (2300, 850);
+  fill(#A91BD1);
+  rect(0, 0, width, 600);
+  fill(#E87D25);
+  rect(0, y1, width, 400);
+
+  //determinant function. determines when to launch x object. 
+  /* When ran, on the screen are various checkpoints (been made visible by drawing lines). When an object reaches one of these checkpoints, it will generate a random value of either 1 or 0. This value will be passed into
+     the launcher variable of the next object, and hence launches (or not) the next object. In this case, object 'a' determines when object 'x' will launch.
+     But since object x comes before 'a' when program is started, it is a 1 by default.
+  */
+  if (a==start || a==start-gap || a==start-gap*2|| a==start-gap*3 || a==start-gap*4 || a==start-gap*5) { 
+    if (xlauncher==0) {                                                                                  
+      xlauncher=round(random(0,1)); // random value is passed into the x launcher
+      nex= round(random(1, 4)); // the obstacle type of object x is determined.
+    }
+  }
+  if (a==stopper+difficultyLevel) { // if, by chance, all checkpoints gave a value of 0, the last checkpoint will give 1 by default.
+    if (xlauncher==0) {
+      xlauncher=1; 
+      nex= round(random(1, 4));
+    }
+  }
+ 
+  if (xlauncher==1) {  //object x launcher. 
+    obstacle(nex, "x"); //When x launcher is 1, object x will spawn. type and object name are passed into the function to draw the obstacle.
+  }
+
+  if ( x==start || x==start-gap || x==start-gap*2|| x==start-gap*3 || x==start-gap*4 || x==start-gap*5) { //object y determinant
+    if (ylauncher==0) {
+      ylauncher=round(random(0,1));
+      next= round(random(1, 4));
+    }
+  }
+  if (x==stopper+difficultyLevel) {
+    if (ylauncher==0) {
+      ylauncher=1;
+      next= round(random(1, 4));
+    }
+  }
+  if (ylauncher==1) {  //object y launcher
+    obstacle(next, "y");
+  }
+
+  if ( y==start || y==start-gap || y==start-gap*2|| y==start-gap*3 || y==start-gap*4 || y==start-gap*5) {   //object z determinant
+    if (zlauncher==0) {
+      zlauncher=round(random(0,1));
+      next2= round(random(1, 4));
+    }
+  }
+  if (y==stopper+difficultyLevel) {
+    if (zlauncher==0) {
+      zlauncher=1;
+      next2= round(random(1, 4));
+      zlauncher=1;
+    }
+  }
+  if (zlauncher==1) {   //object z launcher
+    obstacle(next2, "z");
+  }
+
+  if ( z==start || z==start-gap || z==start-gap*2|| z==start-gap*3 || z==start-gap*4 || z==start-gap*5 ) {  //object a determinant
+    if (alauncher==0) {
+      alauncher=round(random(0,1));
+      next3= round(random(1, 4));
+    }
+  }
+  if (z==stopper+difficultyLevel) {  
+    if (alauncher==0) {
+      alauncher=1;
+      next3= round(random(1, 4));
+      alauncher=1;
+    }
+  }
+  if (alauncher==1) { //object a launcher
+    obstacle(next3, "a");
+  }
+
+  if (x==stopper) {   //x coordinate of objectrestart
+    xlauncher=0;      //when the x coordinate of an object reaches the endpoint, its launcher variable is converted into 0 and its x coordinate is reset (to the width of the screen).
+    x=1440;
+  };
+  if (y==stopper) {
+    ylauncher=0;
+    y=1440;
+  };
+  if (z==stopper) {
+    zlauncher=0;
+    z=1440;
+  };
+  if (a==stopper) {
+    alauncher=0;
+    a=1440;
+  };
+ 
+  stroke(0);
+  strokeWeight(1);
+  line(start, 0, start, height);
+  line(1440, 0, 1440, height);
+  line(start-gap, 0, start-gap, height);
+  line(start-gap*2, 0, start-gap*2, height);
+  line(start-gap*3, 0, start-gap*3, height);
+  line(start-gap*4, 0, start-gap*4, height);
+  line(start-gap*5, 0, start-gap*5, height);
+  line(start-gap*6, 0, start-gap*6, height);
+  println(stopper+difficultyLevel);
+}
+
+
+
+//obstacles add here
+void obstacle(int type, String position) {
+  int x1=400;
+  int blockSz=20;
+  textSize(20);
+  //determines obstacle position
+  if ( position== "x") {
+    x1=x;
+    text("x", x1, 400);
+    x=x-difficultyLevel;
+  }
+  if ( position== "y") {
+    x1=y;
+    text("y", x1, 400);
+    y=y-difficultyLevel;
+  }
+  if ( position== "z") {
+    x1=z;
+    text("z", x1, 400);
+    z=z-difficultyLevel;
+  }
+  if ( position== "a") {
+    x1=a;
+    text("a", x1, 400);
+    a=a-difficultyLevel;
+  }
+
+  //determines obstacle type
+  if (type== 1) {
+    fill (0, 255, 0);
+    rect(x1, y1-blockSz*4, blockSz*5, blockSz*4);
+
+    float f= 80; //circle width and height
+    float f1 = f+f*.5; //face width
+
+    translate(x1, 0);
+    translate(-width/2+f, -height/2+y1-f/2);
+
+    //head
+    strokeWeight(5);
+    stroke(#AF4612);
+    fill(#ED6D2D);
+    rect(width/2-f/2, height/2-f/2, f/2, f, 50);
+    ellipse(width/2-f/2, height/2, f, f);
+    ellipse(width/2, height/2, f, f);
+    //stroke(#ED6D2D);
+    //ridges
+    stroke(#AF4612);
+    fill(#ED6D2D);
+    ellipse(width/2-f/4, height/2, f1*2/3, f);
+    ellipse(width/2-f/4, height/2, f1*1/3, f);
+    //smile
+    noStroke();
+    fill(#DFE310);
+    ellipse(width/2-f/4, height/2+f/6, f1*2/3+(f1-f)/2, f/6*2); 
+    fill(#ED6D2D);
+    //smile blocker
+    noStroke();
+    ellipse(width/2-f/4, height/2+f/12, f1-f1*.1, f/6*2); 
+    stroke(#AF4612);
+    //RIDGE OVER SMILE BLOCKER
+    stroke(#AF4612);
+    arc(width/2-f/4, height/2, f1*2/3, f, radians(-200), radians(20), OPEN);
+    arc(width/2-f/4, height/2, f1*1/3, f, radians(-205), radians(25), OPEN);
+    //left eye
+    fill(#DFE310);
+    noStroke();
+    triangle(width/2-f/4-(f1*2/3)/2, height/2, ((width/2-f/4-(f1*2/3)/2)+(width/2-f/4-(f1*1/3)/2))/2, height/2-f/4, width/2-f/4-(f1*1/3)/2, height/2);
+    //right eye
+    triangle(width/2-f/4+(f1*2/3)/2, height/2, ((width/2-f/4+(f1*2/3)/2)+(width/2-f/4+(f1*1/3)/2))/2, height/2-f/4, width/2-f/4+(f1*1/3)/2, height/2);
+    strokeWeight(1);
+
+    translate(-x1, 0);
+    translate(width/2-f, +height/2-y1+f/2);
+  }
+  if (type ==2) {  
+    fill(0, 0, 255);
+    rect(x1, y1-blockSz*6, blockSz*5, blockSz*6);
+    float p=10;
+    translate(x1, 0);
+    translate(0, y1-p*12);
+    noStroke();
+    rectMode(RADIUS);
+    //head
+    fill(#389B3F);
+    arc(p*3, p*3, p*6, p*6, radians(-135), radians(135), PIE);
+    //upper lip
+    fill(#F5487F);
+    rotate(radians(-45));
+    translate(0, p*3);
+    rect(0, 0, p/2, p*2, 100);
+    translate(0, -p*3);
+    rotate(radians(-315));
+    //lower lip
+    rotate(radians(45));
+    translate(p*4.5, p*1.5);
+    rect(0, 0, p/2, p*2, 100);
+    translate(-p*4.5, -p*1.5);
+    rotate(radians(-45));
+    //upper teeth
+    fill(255);
+    triangle(p, p*1.7, p*.8, p*3, p*1.2, p*1.9);
+    translate(p*.8, p*.8);
+    triangle(p, p*1.7, p*.8, p*3, p*1.2, p*1.9);
+    translate(-p*.8, -p*.8);
+    //lower teeth
+    triangle(p, p*4.7, p*.8, p*3.4, p*1.2, p*4.5);
+    //spots
+    fill(#306734);
+    ellipse (p*4, p*1.5, p*1.4, p*1.5);
+    ellipse (p*5, p*3.5, p*.8, p);
+    ellipse (p*3, p*5, p*.8, p);
+    //stem
+    rectMode(CORNER);
+    rect(p*8, p*4, p*2, p*8);
+    rect(p*6, p*2, p*2, p*2);
+    strokeWeight(100);
+    arc(p*8, p*4, p*4, p*4, radians(-90), radians(0), PIE);
+    translate(-x1, 0);
+    translate(0, -y1+p*12);
+  }
+  if (type ==3) {  
+    fill(0, 255, 255);
+    rect(x1, y1-blockSz*8, blockSz*7, blockSz*8);
+  }
+  if (type ==4) {  
+    fill(255, 0, 255);
+    rect(x1, y1-blockSz*10, blockSz*9, blockSz*10);
+  }
+}
